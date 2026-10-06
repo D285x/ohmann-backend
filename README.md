@@ -35,7 +35,7 @@ API base: `http://localhost:8080/api`
 | `SPRING_PROFILES_ACTIVE` | `h2` for the in-memory demo database; leave unset when using a real DB |
 | `DB_URL` | e.g. `jdbc:mysql://host:3306/ohmann?useSSL=true` or `jdbc:postgresql://host:5432/ohmann` |
 | `DB_USERNAME` / `DB_PASSWORD` | database credentials |
-| `CORS_ALLOWED_ORIGINS` | your Vercel URL, e.g. `https://ohmann.vercel.app` (comma-separated, wildcards allowed) |
+| `CORS_ALLOWED_ORIGINS` | frontend Static Site URL, e.g. `https://ohmann-frontend.onrender.com`; default `https://*.onrender.com,http://localhost:5173` (comma-separated, wildcards allowed) |
 | `AERO_SERVICE_URL` | optional, public URL of the aero-service, e.g. `https://ohmann-aero.onrender.com` |
 | `OPTIMIZER_THREADS` | `2` suits the free instance |
 
@@ -48,4 +48,4 @@ API base: `http://localhost:8080/api`
 
 ### After deploying
 
-Copy the backend URL into the frontend's Vercel variable `VITE_API_URL` as `https://<service>.onrender.com/api` and redeploy the frontend.
+Copy the backend URL into the frontend Static Site's variable `VITE_API_URL` as `https://<service>.onrender.com/api` and redeploy the frontend.
