@@ -5,6 +5,7 @@ import com.anurag.ECE.dto.MissionResponse;
 import com.anurag.ECE.entity.LaunchSite;
 import com.anurag.ECE.entity.LaunchVehicle;
 import com.anurag.ECE.entity.MissionPlan;
+import com.anurag.ECE.exception.ForbiddenException;
 import com.anurag.ECE.exception.ResourceNotFoundException;
 import com.anurag.ECE.physics.*;
 import com.anurag.ECE.repository.MissionPlanRepository;
@@ -135,8 +136,12 @@ public class MissionService {
     }
 
     @Transactional
-    public void delete(Long id) {
-        repo.delete(getEntity(id));
+    public void delete(Long id, Long requesterId) {
+        MissionPlan p = getEntity(id);
+        if (p.getPlannedBy() != null && !p.getPlannedBy().getId().equals(requesterId)) {
+            throw new ForbiddenException("You can only delete plans you created");
+        }
+        repo.delete(p);
     }
 
     /** Re-simulates the stored plan, writes the trajectory to a CSV file and returns the file path. */
@@ -194,6 +199,7 @@ public class MissionService {
         return new MissionResponse(
                 p.getId(), p.getMissionName(), p.getCreatedAt(),
                 p.getPlannedBy() != null ? p.getPlannedBy().getFullName() : null,
+                p.getPlannedBy() != null ? p.getPlannedBy().getId() : null,
                 p.getVehicle().getName(), p.getSite().getName(),
                 p.getSite().getLatitudeDeg(), p.getSite().getLongitudeDeg(), p.getOrbitType(),
                 p.getTargetAltitudeKm(), p.getInclinationDeg(), p.getPayloadKg(),

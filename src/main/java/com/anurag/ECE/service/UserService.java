@@ -45,6 +45,11 @@ public class UserService {
         return id == null ? Optional.empty() : repo.findById(id);
     }
 
+    @Transactional(readOnly = true)
+    public UserResponse get(Long id) {
+        return toResponse(getEntity(id));
+    }
+
     /** Checks the password against the stored salted hash (constant-time comparison). */
     @Transactional(readOnly = true)
     public UserResponse login(LoginRequest req) {

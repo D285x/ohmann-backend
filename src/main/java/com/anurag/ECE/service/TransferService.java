@@ -6,6 +6,7 @@ import com.anurag.ECE.dto.TransferSummary;
 import com.anurag.ECE.dto.TransferWindowDto;
 import com.anurag.ECE.entity.*;
 import com.anurag.ECE.exception.InvalidRequestException;
+import com.anurag.ECE.exception.ForbiddenException;
 import com.anurag.ECE.exception.ResourceNotFoundException;
 import com.anurag.ECE.physics.*;
 import com.anurag.ECE.repository.TransferPlanRepository;
@@ -130,13 +131,17 @@ public class TransferService {
                         p.getDepartureUtc(), p.getArrivalUtc(), p.getTimeOfFlightDays(), p.getC3Km2s2(),
                         p.getDepartureDvMs(), p.getArrivalDvMs(), p.getTotalDvMs(), p.getVehicleName(),
                         p.getPayloadCapacityKg(),
-                        p.getPlannedBy() != null ? p.getPlannedBy().getFullName() : null))
+                        p.getPlannedBy() != null ? p.getPlannedBy().getFullName() : null,
+                        p.getPlannedBy() != null ? p.getPlannedBy().getId() : null))
                 .toList();
     }
 
     @Transactional
-    public void delete(Long id) {
+    public void delete(Long id, Long requesterId) {
         TransferPlan p = repo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Transfer plan", id));
+        if (p.getPlannedBy() != null && !p.getPlannedBy().getId().equals(requesterId)) {
+            throw new ForbiddenException("You can only delete plans you created");
+        }
         repo.delete(p);
     }
 }

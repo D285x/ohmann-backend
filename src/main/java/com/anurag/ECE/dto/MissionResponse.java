@@ -11,6 +11,7 @@ public record MissionResponse(
         String missionName,
         Instant createdAt,
         String plannedBy,
+        Long plannedById,
         String vehicleName,
         String siteName,
         double siteLatitudeDeg,

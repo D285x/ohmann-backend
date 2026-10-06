@@ -177,15 +177,16 @@ The frontend is a Render **Static Site** built from [ohmann-frontend](https://gi
 | PUT, DELETE | `/api/bodies/{id}` | Update / delete a body |
 | POST | `/api/missions/plan` | Optimize a launch (saved when `save` is true) |
 | GET | `/api/missions` | Saved launch plans |
-| GET, DELETE | `/api/missions/{id}` | Plan with its trajectory / delete |
+| GET, DELETE | `/api/missions/{id}` | Plan with its trajectory / delete (own plans only, needs a session token) |
 | GET | `/api/missions/{id}/export` | Trajectory as CSV |
 | POST | `/api/transfers/plan` | Find transfer windows (saved when `save` is true) |
 | GET | `/api/transfers` | Saved transfer plans |
-| DELETE | `/api/transfers/{id}` | Delete a transfer plan |
-| POST | `/api/users/register` | Create an operator (201; 400 on invalid input; 409 if the email exists) |
-| POST | `/api/users/login` | Check credentials (200 or 401) |
+| DELETE | `/api/transfers/{id}` | Delete a transfer plan (own plans only, needs a session token) |
+| POST | `/api/users/register` | Create an operator and log in (201 with a session token; 400 on invalid input; 409 if the email exists) |
+| POST | `/api/users/login` | Log in (200 with a session token, or 401) |
+| GET | `/api/users/me` | The operator behind the session token (401 if missing or expired) |
 | GET | `/api/users` | List operators |
-| DELETE | `/api/users/{id}` | Remove an operator (their plans are kept) |
+| DELETE | `/api/users/{id}` | Delete your own account (needs a session token; their plans are kept) |
 | GET | `/api/stats` | Dashboard figures |
 
 Invalid input returns HTTP 400 with a message per field, which the forms show under the matching input:
@@ -196,7 +197,14 @@ Invalid input returns HTTP 400 with a message per field, which the forms show un
 
 Import `postman/OhMann.postman_collection.json` into Postman to try every endpoint. It targets the live backend by default (switch `baseUrl` to `localUrl` for a local one); run the folders in order, since the mission-1 requests need a saved plan.
 
-Login is a simple credential check for attributing plans; the API itself is not protected by tokens or sessions.
+### Who can delete what
+
+Logging in returns a random session token, which the frontend sends as `Authorization: Bearer <token>`. The server uses it to enforce two rules:
+
+- a launch or transfer plan can be deleted only by the operator who saved it (plans whose owner deleted their account can be deleted by any logged-in operator);
+- an operator can delete only their own account.
+
+Anything else is rejected with 401 (not logged in or session expired) or 403 (someone else's plan or account). Sessions are kept in memory, so restarting the server logs everyone out. Browsing, planning, and editing vehicles, sites and bodies stay open to everyone. Passwords are stored as salted PBKDF2 hashes.
 
 ## 6. How the calculations work
 
