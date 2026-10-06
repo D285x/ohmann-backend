@@ -1,0 +1,9 @@
+fastapi>=0.115
+uvicorn[standard]>=0.32
+pydantic>=2.9
+
+# shockFLOW is optional (GPU CFD backend). Install it separately, following its
+# own README, from https://github.com/DKrasauskas/shockFLOW - its compiled
+# CUDA/C++ core is proprietary and not redistributed here. Needs an NVIDIA GPU
+# with driver >= 580. Without it, this service still runs and answers every
+# request with the analytic fallback in fallback.py.

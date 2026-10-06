@@ -1,0 +1,9 @@
+target/
+exports/
+aero-service/
+database/
+postman/
+docs/
+.git/
+.idea/
+*.iml

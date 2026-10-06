@@ -1,0 +1,355 @@
+{
+  "info": {
+    "name": "OhMann (ESE3104)",
+    "description": "REST API tests for the OhMann Spring Boot backend. Start the backend on port 8080 first.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080/api"
+    }
+  ],
+  "item": [
+    {
+      "name": "Vehicles",
+      "item": [
+        {
+          "name": "List vehicles",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/vehicles"
+          }
+        },
+        {
+          "name": "Get vehicle 1",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/vehicles/1"
+          }
+        },
+        {
+          "name": "Create vehicle",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/vehicles",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"SSLV\",\n  \"manufacturer\": \"ISRO\",\n  \"country\": \"India\",\n  \"diameterM\": 2.0,\n  \"dragCoefficient\": 0.3,\n  \"stages\": [\n    { \"name\": \"SS1\", \"propellantMassKg\": 87000, \"dryMassKg\": 12000, \"thrustKn\": 2100, \"ispS\": 250 },\n    { \"name\": \"SS2\", \"propellantMassKg\": 7700, \"dryMassKg\": 1600, \"thrustKn\": 240, \"ispS\": 280 },\n    { \"name\": \"SS3\", \"propellantMassKg\": 4500, \"dryMassKg\": 900, \"thrustKn\": 160, \"ispS\": 290 },\n    { \"name\": \"VTM\", \"propellantMassKg\": 50, \"dryMassKg\": 100, \"thrustKn\": 0.1, \"ispS\": 200 }\n  ]\n}"
+            }
+          }
+        },
+        {
+          "name": "Create vehicle (validation error)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/vehicles",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"\",\n  \"diameterM\": -1,\n  \"dragCoefficient\": 5,\n  \"stages\": []\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete vehicle",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/vehicles/5"
+          }
+        },
+        {
+          "name": "Refine aerodynamics (aero-service)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/vehicles/1/aero/refine",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"noseFinenessRatio\": 3.0,\n  \"machMin\": 0.3,\n  \"machMax\": 5.0,\n  \"points\": 24\n}"
+            }
+          }
+        },
+        {
+          "name": "Reset aerodynamics to constant Cd",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/vehicles/1/aero"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Sites",
+      "item": [
+        {
+          "name": "List sites",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/sites"
+          }
+        },
+        {
+          "name": "Create site",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/sites",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Kulasekarapattinam\",\n  \"country\": \"India\",\n  \"latitudeDeg\": 8.43,\n  \"longitudeDeg\": 78.05,\n  \"minAzimuthDeg\": 140,\n  \"maxAzimuthDeg\": 200\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Celestial bodies",
+      "item": [
+        {
+          "name": "List bodies",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/bodies"
+          }
+        },
+        {
+          "name": "Add Ceres",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/bodies",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Ceres\",\n  \"bodyType\": \"DWARF_PLANET\",\n  \"semiMajorAxisAu\": 2.7675,\n  \"meanLongitudeJ2000Deg\": 153.9,\n  \"gmKm3s2\": 62.63,\n  \"radiusKm\": 469.7\n}"
+            }
+          }
+        },
+        {
+          "name": "Add body (validation error)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/bodies",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"\",\n  \"semiMajorAxisAu\": 0,\n  \"meanLongitudeJ2000Deg\": 400,\n  \"gmKm3s2\": -1,\n  \"radiusKm\": 0\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Launch planning",
+      "item": [
+        {
+          "name": "Plan SSO mission (PSLV from Sriharikota)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/missions/plan",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"missionName\": \"EOS-12\",\n  \"vehicleId\": 2,\n  \"siteId\": 1,\n  \"orbitType\": \"SSO\",\n  \"altitudeKm\": 600,\n  \"payloadKg\": 1200,\n  \"targetRaanDeg\": 45,\n  \"save\": true,\n  \"operatorId\": 1\n}"
+            }
+          }
+        },
+        {
+          "name": "Plan GTO mission (Falcon 9 from Cape Canaveral)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/missions/plan",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"missionName\": \"COMSAT-1\",\n  \"vehicleId\": 1,\n  \"siteId\": 2,\n  \"orbitType\": \"GTO\",\n  \"altitudeKm\": 200,\n  \"payloadKg\": 5000,\n  \"save\": true,\n  \"operatorId\": 1\n}"
+            }
+          }
+        },
+        {
+          "name": "Mission history",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/missions"
+          }
+        },
+        {
+          "name": "Mission 1 with trajectory",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/missions/1"
+          }
+        },
+        {
+          "name": "Export mission 1 CSV",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/missions/1/export"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Transfers",
+      "item": [
+        {
+          "name": "Earth to Mars windows",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/transfers/plan",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"originId\": 3,\n  \"destinationId\": 4,\n  \"windowCount\": 3,\n  \"parkingAltitudeKm\": 200,\n  \"captureAltitudeKm\": 400,\n  \"vehicleId\": 1,\n  \"siteId\": 2,\n  \"operatorId\": 1,\n  \"save\": true\n}"
+            }
+          }
+        },
+        {
+          "name": "Transfer history",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/transfers"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Operators",
+      "item": [
+        {
+          "name": "Register operator",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/users/register",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"Shaun Praneeth Raj\",\n  \"email\": \"24eg104b27@anurag.edu.in\",\n  \"phone\": \"9876543210\",\n  \"organization\": \"Anurag University\",\n  \"role\": \"STUDENT\",\n  \"password\": \"Orbit@2026\",\n  \"confirmPassword\": \"Orbit@2026\",\n  \"acceptedTerms\": true\n}"
+            }
+          }
+        },
+        {
+          "name": "Log in",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/users/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"24eg104b27@anurag.edu.in\",\n  \"password\": \"Orbit@2026\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Log in (wrong password)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/users/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"24eg104b27@anurag.edu.in\",\n  \"password\": \"wrong\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Register operator (validation errors)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/users/register",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"S\",\n  \"email\": \"not-an-email\",\n  \"phone\": \"12345\",\n  \"password\": \"weak\",\n  \"confirmPassword\": \"different\",\n  \"acceptedTerms\": false\n}"
+            }
+          }
+        },
+        {
+          "name": "List operators",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/users"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Stats (JDBC)",
+      "item": [
+        {
+          "name": "Dashboard stats",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/stats"
+          }
+        }
+      ]
+    }
+  ]
+}

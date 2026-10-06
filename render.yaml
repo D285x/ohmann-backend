@@ -1,0 +1,36 @@
+# Render Blueprint: New > Blueprint > pick this repo.
+services:
+  - type: web
+    name: ohmann-backend
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /api/vehicles
+    envVars:
+      # Set to "h2" to run with the in-memory database (no external DB needed, data lost on restart).
+      # Leave empty and fill DB_URL / DB_USERNAME / DB_PASSWORD to use MySQL or PostgreSQL.
+      - key: SPRING_PROFILES_ACTIVE
+        value: h2
+      - key: DB_URL
+        sync: false
+      - key: DB_USERNAME
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      # Your Vercel URL(s), comma-separated. Wildcards allowed.
+      - key: CORS_ALLOWED_ORIGINS
+        value: https://*.vercel.app,http://localhost:5173
+      - key: OPTIMIZER_THREADS
+        value: "2"
+      # Public URL of the aero-service below, e.g. https://ohmann-aero.onrender.com
+      - key: AERO_SERVICE_URL
+        sync: false
+
+  - type: web
+    name: ohmann-aero
+    runtime: python
+    plan: free
+    rootDir: aero-service
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
