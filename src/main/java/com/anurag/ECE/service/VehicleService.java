@@ -2,6 +2,8 @@ package com.anurag.ECE.service;
 
 import com.anurag.ECE.aero.AeroClient;
 import com.anurag.ECE.aero.AeroCurveResult;
+import com.anurag.ECE.aero.AeroServiceException;
+import com.anurag.ECE.aero.AnalyticDragModel;
 import com.anurag.ECE.dto.AeroRefineRequest;
 import com.anurag.ECE.dto.VehicleDto;
 import com.anurag.ECE.entity.LaunchVehicle;
@@ -9,6 +11,8 @@ import com.anurag.ECE.exception.ConflictException;
 import com.anurag.ECE.exception.ResourceNotFoundException;
 import com.anurag.ECE.repository.LaunchVehicleRepository;
 import com.anurag.ECE.repository.MissionPlanRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,6 +21,8 @@ import java.util.List;
 
 @Service
 public class VehicleService {
+
+    private static final Logger log = LoggerFactory.getLogger(VehicleService.class);
 
     private final LaunchVehicleRepository repo;
     private final MissionPlanRepository missions;
@@ -77,8 +83,9 @@ public class VehicleService {
     /**
      * Calls the aero-service to fetch a Mach-indexed drag coefficient curve
      * (shockFLOW CFD, or its analytic fallback) and stores it on the vehicle.
-     * Propagates {@link com.anurag.ECE.aero.AeroServiceException} on failure;
-     * the vehicle's existing constant drag coefficient is left untouched.
+     * If the aero-service is not deployed or cannot be reached, the same analytic
+     * model is computed here instead ({@link AnalyticDragModel}), so the feature
+     * works on a single-service deployment too.
      */
     @Transactional
     public VehicleDto refineAero(Long id, AeroRefineRequest req) {
@@ -88,7 +95,13 @@ public class VehicleService {
         double machMax = req != null && req.machMax() != null ? req.machMax() : 5.0;
         int points = req != null && req.points() != null ? req.points() : 24;
 
-        AeroCurveResult result = aeroClient.fetchDragCurve(v.getDiameterM(), fineness, machMin, machMax, points);
+        AeroCurveResult result;
+        try {
+            result = aeroClient.fetchDragCurve(v.getDiameterM(), fineness, machMin, machMax, points);
+        } catch (AeroServiceException e) {
+            log.info("Aero-service unavailable ({}); using the built-in analytic drag model", e.getMessage());
+            result = AnalyticDragModel.dragCurve(fineness, machMin, machMax, points);
+        }
         v.setDragCurveJson(Mapper.dragCurveToJson(result.mach(), result.cd()));
         v.setAeroSource("shockflow".equalsIgnoreCase(result.source()) ? "SHOCKFLOW" : "ANALYTIC_FALLBACK");
         return Mapper.toDto(repo.save(v));

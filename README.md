@@ -36,7 +36,7 @@ API base: `http://localhost:8080/api`
 | `DB_URL` | e.g. `jdbc:mysql://host:3306/ohmann?useSSL=true` or `jdbc:postgresql://host:5432/ohmann` |
 | `DB_USERNAME` / `DB_PASSWORD` | database credentials |
 | `CORS_ALLOWED_ORIGINS` | frontend Static Site URL, e.g. `https://ohmann-frontend.onrender.com`; default `https://*.onrender.com,http://localhost:5173` (comma-separated, wildcards allowed) |
-| `AERO_SERVICE_URL` | optional, public URL of the aero-service, e.g. `https://ohmann-aero.onrender.com` |
+| `AERO_SERVICE_URL` | optional, public URL of the aero-service, e.g. `https://ohmann-aero.onrender.com`. Without it, "Refine aero" uses the same analytic drag model built into the backend |
 | `OPTIMIZER_THREADS` | `2` suits the free instance |
 
 `PORT` is injected by Render automatically.
