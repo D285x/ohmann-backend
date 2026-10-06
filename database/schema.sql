@@ -1,6 +1,9 @@
 -- OhMann MySQL schema (reference).
 -- Hibernate creates/updates these tables automatically (spring.jpa.hibernate.ddl-auto=update);
 -- run this script only if you prefer to create the schema by hand.
+-- Column names match Hibernate's default snake_case naming exactly (including the
+-- slightly odd ones such as diameterm, isps and insertion_times), so the app and this
+-- script agree on the same tables.
 
 CREATE DATABASE IF NOT EXISTS ohmann;
 USE ohmann;
@@ -10,8 +13,10 @@ CREATE TABLE IF NOT EXISTS launch_vehicles (
     name             VARCHAR(80)  NOT NULL UNIQUE,
     manufacturer     VARCHAR(80),
     country          VARCHAR(60),
-    diameter_m       DOUBLE       NOT NULL,
-    drag_coefficient DOUBLE       NOT NULL
+    diameterm        DOUBLE       NOT NULL,
+    drag_coefficient DOUBLE       NOT NULL,
+    aero_source      VARCHAR(20)  NOT NULL DEFAULT 'CONSTANT',
+    drag_curve_json  TEXT
 );
 
 CREATE TABLE IF NOT EXISTS vehicle_stages (
@@ -22,7 +27,7 @@ CREATE TABLE IF NOT EXISTS vehicle_stages (
     propellant_mass_kg DOUBLE      NOT NULL,
     dry_mass_kg        DOUBLE      NOT NULL,
     thrust_kn          DOUBLE      NOT NULL,
-    isp_s              DOUBLE      NOT NULL,
+    isps               DOUBLE      NOT NULL,
     CONSTRAINT fk_stage_vehicle FOREIGN KEY (vehicle_id) REFERENCES launch_vehicles (id) ON DELETE CASCADE
 );
 
@@ -41,7 +46,7 @@ CREATE TABLE IF NOT EXISTS celestial_bodies (
     name                      VARCHAR(40) NOT NULL UNIQUE,
     body_type                 VARCHAR(20) NOT NULL,
     semi_major_axis_au        DOUBLE NOT NULL,
-    mean_longitude_j2000deg   DOUBLE NOT NULL,
+    mean_longitude_j2000_deg  DOUBLE NOT NULL,
     gm_km3s2                  DOUBLE NOT NULL,
     radius_km                 DOUBLE NOT NULL
 );
@@ -82,7 +87,7 @@ CREATE TABLE IF NOT EXISTS mission_plans (
     dv_margin_ms         DOUBLE,
     max_payload_kg       DOUBLE,
     max_qk_pa            DOUBLE,
-    insertion_time_s     DOUBLE,
+    insertion_times      DOUBLE,
     next_window_utc      DATETIME(6),
     notes                VARCHAR(2000),
     CONSTRAINT fk_mission_vehicle FOREIGN KEY (vehicle_id) REFERENCES launch_vehicles (id),
@@ -100,7 +105,7 @@ CREATE TABLE IF NOT EXISTS transfer_plans (
     arrival_utc         DATETIME(6),
     time_of_flight_days DOUBLE,
     phase_angle_deg     DOUBLE,
-    c3km2s2             DOUBLE,
+    c3_km2s2            DOUBLE,
     departure_dv_ms     DOUBLE,
     arrival_dv_ms       DOUBLE,
     total_dv_ms         DOUBLE,

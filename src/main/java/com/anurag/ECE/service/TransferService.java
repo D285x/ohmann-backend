@@ -107,7 +107,7 @@ public class TransferService {
             p.setTotalDvMs(w.totalDvMs());
             p.setVehicleName(vehicleName);
             p.setPayloadCapacityKg(capacity);
-            if (req.operatorId() != null) p.setPlannedBy(users.getEntity(req.operatorId()));
+            p.setPlannedBy(users.findEntity(req.operatorId()).orElse(null));
             savedId = repo.save(p).getId();
         }
 

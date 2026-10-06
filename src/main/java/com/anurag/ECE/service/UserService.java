@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserService {
@@ -33,6 +34,15 @@ public class UserService {
 
     public AppUser getEntity(Long id) {
         return repo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Operator", id));
+    }
+
+    /**
+     * Operator lookup for attributing a saved plan. Returns empty instead of failing when
+     * the id no longer exists (e.g. a browser still remembers a login from before the
+     * in-memory demo database was reset), so the plan is still saved, just unattributed.
+     */
+    public Optional<AppUser> findEntity(Long id) {
+        return id == null ? Optional.empty() : repo.findById(id);
     }
 
     /** Checks the password against the stored salted hash (constant-time comparison). */

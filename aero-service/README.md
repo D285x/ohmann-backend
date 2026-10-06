@@ -10,7 +10,7 @@ to refine a launch vehicle's drag coefficient into a Mach-indexed curve.
 shockFLOW's interface is Python, and its CUDA/C++ core is compiled and
 proprietary (not something to bundle into this repository). Wrapping it in a
 tiny HTTP service, called from Spring Boot's `AeroClient`
-(`backend/src/main/java/com/anurag/ECE/aero/AeroClient.java`), keeps that
+(`src/main/java/com/anurag/ECE/aero/AeroClient.java`), keeps that
 dependency isolated and optional: nothing else in OhMann needs Python or a
 GPU to run.
 
@@ -21,6 +21,14 @@ second on top of that, so it reads a vehicle's *already-fetched* drag curve
 (cached as JSON on the `launch_vehicles` row) rather than calling out to CFD
 mid-simulation. "Refine aerodynamics" is a one-off action you trigger from
 the Vehicles page; the result is stored and reused by every later plan.
+
+## Do you need it?
+
+No. The backend contains a Java port of the same analytic model
+(`src/main/java/com/anurag/ECE/aero/AnalyticDragModel.java`, numerically
+identical to `fallback.py`) and uses it whenever this service is not
+configured or cannot be reached. The hosted demo runs that way. Run this
+service only if you want to plug in real shockFLOW GPU results.
 
 ## Running it
 
@@ -64,15 +72,20 @@ response:
 
 ## Backend wiring
 
-`application.properties`:
+`application.properties` (or the `AERO_SERVICE_URL` environment variable, e.g. on Render):
 ```
-ohmann.aero.service-url=http://localhost:8500
+ohmann.aero.service-url=${AERO_SERVICE_URL:http://localhost:8500}
 ohmann.aero.timeout-seconds=180
 ```
+
+To host it on Render: New > Web Service > this repository, Language Python 3,
+Root Directory `aero-service`, Build Command `pip install -r requirements.txt`,
+Start Command `uvicorn main:app --host 0.0.0.0 --port $PORT`. Then set
+`AERO_SERVICE_URL` on the backend service to its URL.
 
 `POST /api/vehicles/{id}/aero/refine` (optional body: `noseFinenessRatio`,
 `machMin`, `machMax`, `points`) fetches a curve and stores it on the vehicle;
 `DELETE /api/vehicles/{id}/aero` discards it, reverting to the vehicle's
-constant drag coefficient. If this service is not running, `refine` returns
-HTTP 503 with a message naming the problem; every other feature of OhMann is
-unaffected.
+constant drag coefficient. If this service is not running, `refine` falls back
+to the backend's built-in copy of the analytic model, so the button always
+works; every other feature of OhMann is unaffected.

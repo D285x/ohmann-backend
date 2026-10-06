@@ -1,13 +1,17 @@
 package com.anurag.ECE.config;
 
+import com.anurag.ECE.entity.AppUser;
 import com.anurag.ECE.entity.BodyType;
 import com.anurag.ECE.entity.CelestialBody;
 import com.anurag.ECE.entity.LaunchSite;
 import com.anurag.ECE.entity.LaunchVehicle;
 import com.anurag.ECE.entity.Stage;
+import com.anurag.ECE.entity.UserRole;
+import com.anurag.ECE.repository.AppUserRepository;
 import com.anurag.ECE.repository.CelestialBodyRepository;
 import com.anurag.ECE.repository.LaunchSiteRepository;
 import com.anurag.ECE.repository.LaunchVehicleRepository;
+import com.anurag.ECE.util.PasswordHasher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
@@ -28,11 +32,18 @@ public class DataSeeder implements CommandLineRunner {
     private final LaunchVehicleRepository vehicles;
     private final LaunchSiteRepository sites;
     private final CelestialBodyRepository bodies;
+    private final AppUserRepository users;
 
-    public DataSeeder(LaunchVehicleRepository vehicles, LaunchSiteRepository sites, CelestialBodyRepository bodies) {
+    /** Shared demo login, recreated on every start so reviewers never have to register first. */
+    public static final String DEMO_EMAIL = "demo@ohmann.app";
+    public static final String DEMO_PASSWORD = "ohmann-demo";
+
+    public DataSeeder(LaunchVehicleRepository vehicles, LaunchSiteRepository sites, CelestialBodyRepository bodies,
+                      AppUserRepository users) {
         this.vehicles = vehicles;
         this.sites = sites;
         this.bodies = bodies;
+        this.users = users;
     }
 
     @Override
@@ -79,6 +90,18 @@ public class DataSeeder implements CommandLineRunner {
                     new CelestialBody("Uranus", BodyType.PLANET, 19.21845, 314.0550, 5_793_939, 25_362),
                     new CelestialBody("Neptune", BodyType.PLANET, 30.11039, 304.3487, 6_836_529, 24_622)));
             log.info("Seeded {} celestial bodies", bodies.count());
+        }
+        if (!users.existsByEmailIgnoreCase(DEMO_EMAIL)) {
+            AppUser demo = new AppUser();
+            demo.setFullName("Demo Operator");
+            demo.setEmail(DEMO_EMAIL);
+            demo.setOrganization("OhMann demo");
+            demo.setRole(UserRole.MISSION_PLANNER);
+            String salt = PasswordHasher.newSalt();
+            demo.setPasswordSalt(salt);
+            demo.setPasswordHash(PasswordHasher.hash(DEMO_PASSWORD, salt));
+            users.save(demo);
+            log.info("Seeded demo operator {}", DEMO_EMAIL);
         }
     }
 

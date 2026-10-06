@@ -86,7 +86,7 @@ public class MissionService {
         MissionPlan plan = new MissionPlan();
         plan.setMissionName(req.missionName().trim());
         plan.setVehicle(vehicle);
-        if (req.operatorId() != null) plan.setPlannedBy(users.getEntity(req.operatorId()));
+        plan.setPlannedBy(users.findEntity(req.operatorId()).orElse(null));
         plan.setSite(site);
         plan.setOrbitType(req.orbitType());
         plan.setTargetAltitudeKm(req.altitudeKm());

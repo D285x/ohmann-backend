@@ -1,12 +1,16 @@
 {
   "info": {
     "name": "OhMann (ESE3104)",
-    "description": "REST API tests for the OhMann Spring Boot backend. Start the backend on port 8080 first.",
+    "description": "REST API tests for the OhMann Spring Boot backend. baseUrl points at the live Render deployment; to test a local backend, set baseUrl to the value of localUrl. The first request after the free Render instance has been idle can take up to a minute while it wakes. Run the folders in order (or use the Collection Runner): the requests for mission 1 need a plan saved first. operatorId 1 and the Log in requests use the built-in demo account (demo@ohmann.app / ohmann-demo).",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
     {
       "key": "baseUrl",
+      "value": "https://ohmann-backend.onrender.com/api"
+    },
+    {
+      "key": "localUrl",
       "value": "http://localhost:8080/api"
     }
   ],
@@ -70,7 +74,7 @@
           }
         },
         {
-          "name": "Refine aerodynamics (aero-service)",
+          "name": "Refine aerodynamics (drag curve)",
           "request": {
             "method": "POST",
             "header": [
@@ -292,7 +296,7 @@
             "url": "{{baseUrl}}/users/login",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"24eg104b27@anurag.edu.in\",\n  \"password\": \"Orbit@2026\"\n}"
+              "raw": "{\n  \"email\": \"demo@ohmann.app\",\n  \"password\": \"ohmann-demo\"\n}"
             }
           }
         },
@@ -309,7 +313,7 @@
             "url": "{{baseUrl}}/users/login",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"24eg104b27@anurag.edu.in\",\n  \"password\": \"wrong\"\n}"
+              "raw": "{\n  \"email\": \"demo@ohmann.app\",\n  \"password\": \"wrong\"\n}"
             }
           }
         },
